@@ -1,0 +1,971 @@
+﻿<UserControl x:Class="EpraConstructor.EpraExpandedWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             d:DesignWidth="1280" Height="1017">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="36"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- TITLE BAR -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource BgBrush}"
+                BorderBrush="{DynamicResource BorderDimBrush}"
+                BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Content="← Назад"
+                        Style="{StaticResource CaptionBtn}"
+                        Width="70" FontFamily="Segoe UI" FontSize="10"
+                        Foreground="{DynamicResource DimCyanBrush}"
+                        Click="BtnBack_Click"/>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0">
+                    <TextBlock x:Name="TxtTitle"
+                               Text=""
+                               FontFamily="Consolas" FontSize="13" FontWeight="Bold"
+                               Foreground="{DynamicResource NeonCyanBrush}"
+                               VerticalAlignment="Center"/>
+
+                    <Border Background="{DynamicResource BadgeGreenBgBrush}"
+                            BorderBrush="{DynamicResource NeonGreenBrush}"
+                            BorderThickness="1" CornerRadius="3" Padding="6,2" Margin="10,0,0,0"
+                            VerticalAlignment="Center">
+                        <TextBlock Text="⚡ ПРИОРИТЕТ" FontFamily="Consolas" FontSize="9" FontWeight="Bold"
+                                   Foreground="{DynamicResource NeonGreenBrush}"/>
+                    </Border>
+
+                    <Border Background="{DynamicResource BadgeStatusBgBrush}"
+                            BorderBrush="{DynamicResource BadgeStatusBorderBrush}"
+                            BorderThickness="1" CornerRadius="3" Padding="6,2" Margin="6,0,0,0"
+                            VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse x:Name="StatusDot" Width="6" Height="6"
+                                     Fill="{DynamicResource NeonGreenBrush}" 
+                                     Margin="0,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtConnectionStatus" Text="ОНЛАЙН"
+                                       FontFamily="Consolas" FontSize="9"
+                                       Foreground="{DynamicResource StatusOnlineBrush}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border x:Name="ServiceModeBadge"
+        Background="{DynamicResource ServiceBadgeBgBrush}"
+        BorderBrush="{DynamicResource NeonYellowBrush}"
+        BorderThickness="1" CornerRadius="3" Padding="6,2" Margin="6,0,0,0"
+        VerticalAlignment="Center" Visibility="Collapsed">
+                        <TextBlock x:Name="TxtServiceBadge" Text="🔓 СЕРВИС"
+               FontFamily="Consolas" FontSize="9" FontWeight="Bold"
+               Foreground="{DynamicResource NeonYellowBrush}"/>
+                    </Border>
+                </StackPanel>
+
+                <ToggleButton Grid.Column="2" Style="{StaticResource ToggleSwitch}"
+                              IsChecked="True" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            </Grid>
+        </Border>
+
+        <!-- MAIN CONTENT -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300" MinWidth="280" MaxWidth="400"/>
+                <ColumnDefinition Width="*" MinWidth="600"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Width="1" HorizontalAlignment="Right"
+                    Background="{DynamicResource BorderDimBrush}" Margin="0,4"/>
+
+            <!-- LEFT COLUMN -->
+            <ScrollViewer Grid.Column="0" 
+                          VerticalScrollBarVisibility="Auto" 
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="10,10,14,10" Margin="10,0,0,0">
+                <StackPanel>
+                    <!-- УПРАВЛЕНИЕ -->
+                    <Border Style="{StaticResource PanelBorder}" Margin="0,0,0,8">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="⚙" FontSize="13" Foreground="{DynamicResource NeonGreenBrush}"
+                                           Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Управление в реальном времени"
+                                           Style="{StaticResource SectionTitle}"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <StackPanel HorizontalAlignment="Stretch">
+                                    <Grid Margin="0,0,0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Уровень тока(мощность)"
+                                                   Style="{StaticResource NeonLabel}"/>
+                                        <TextBlock Grid.Column="1" x:Name="TxtLeftCurrent"
+                                                   Text="—" Style="{StaticResource MonoValueSmall}"/>
+                                    </Grid>
+                                    <Slider x:Name="SliderLeftCurrent"
+                                            Style="{StaticResource NeonSlider}"
+                                            Minimum="50" Maximum="100" Value="0"
+                                            ValueChanged="SliderLeftCurrent_ValueChanged"
+                                            Thumb.DragStarted="SliderLeftCurrent_DragStarted"
+                                            Thumb.DragCompleted="SliderLeftCurrent_DragCompleted"
+                                            Width="263"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="85"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="46"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition Height="20"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Уров.стаб" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                <ProgressBar x:Name="PbVoltage" Grid.Row="0" Grid.Column="1" Style="{StaticResource PbGreen}" Value="0" Maximum="100" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="TxtVoltage" Grid.Row="0" Grid.Column="2" Text="—" Style="{StaticResource MonoValueSmall}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Мощн.потр" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                <ProgressBar x:Name="PbCurrent" Grid.Row="1" Grid.Column="1" Style="{StaticResource PbCyan}" Value="0" Maximum="100" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="TxtCurrent" Grid.Row="1" Grid.Column="2" Text="—" Style="{StaticResource MonoValueSmall}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Ток лампы" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                <ProgressBar x:Name="PbTemp" Grid.Row="2" Grid.Column="1" Style="{StaticResource PbOrange}" Value="0" Maximum="100" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="TxtTemp" Grid.Row="2" Grid.Column="2" Text="—" Style="{StaticResource MonoValueSmall}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="BtnLamp"
+                                        Content="☀  Вкл"
+                                        Click="BtnLamp_Click"
+                                        Grid.ColumnSpan="3"
+                                        HorizontalAlignment="Stretch"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- МОНИТОРИНГ -->
+                    <Border Style="{StaticResource PanelBorder}" Margin="0,0,0,8">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="◉" FontSize="13" Foreground="{DynamicResource NeonCyanBrush}"
+                                           Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Мониторинг" Style="{StaticResource SectionTitle}"/>
+                            </StackPanel>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,4,6">
+                                    <TextBlock Text="Напряж. сети" Style="{StaticResource NeonLabel}"/>
+                                    <TextBlock x:Name="TxtMonVoltage" Text="—" Style="{StaticResource MonoValueSmall}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="0" Grid.Column="1" Margin="4,0,0,6">
+                                    <TextBlock Text="Время до старта" Style="{StaticResource NeonLabel}"/>
+                                    <TextBlock x:Name="TxtMonStartTime" Text="—" Style="{StaticResource MonoValueSmall}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,4,6">
+                                    <TextBlock Text="Мощность потр." Style="{StaticResource NeonLabel}"/>
+                                    <TextBlock x:Name="TxtMonPower" Text="—" Style="{StaticResource MonoValueSmall}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="1" Margin="4,0,0,6">
+                                    <TextBlock Text="Частота (катоды)" Style="{StaticResource NeonLabel}"/>
+                                    <TextBlock x:Name="TxtMonFreqCathode" Text="—" Style="{StaticResource MonoValueSmall}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,4,6">
+                                    <TextBlock Text="Ток лампы" Style="{StaticResource NeonLabel}"/>
+                                    <TextBlock x:Name="TxtMonCurrent" Text="—" Style="{StaticResource MonoValueSmall}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="2" Grid.Column="1" Margin="4,0,0,6">
+                                    <TextBlock Text="Частота (разряд)" Style="{StaticResource NeonLabel}"/>
+                                    <TextBlock x:Name="TxtMonFreqDischarge" Text="—" Style="{StaticResource MonoValueSmall}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="3" Grid.Column="0" Margin="0,0,4,6">
+                                    <TextBlock Text="Температура" Style="{StaticResource NeonLabel}"/>
+                                    <TextBlock x:Name="TxtMonTemp" Text="—" Style="{StaticResource MonoValueSmall}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="3" Grid.Column="1" Margin="4,0,0,6">
+                                    <TextBlock Text="Ошибки UART" Style="{StaticResource NeonLabel}"/>
+                                    <TextBlock x:Name="TxtMonUartErrors" Text="—" Style="{StaticResource MonoValueSmall}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="4" Grid.Column="0" Margin="0,0,4,6">
+                                    <TextBlock Text="Циклы поджига" Style="{StaticResource NeonLabel}"/>
+                                    <TextBlock x:Name="TxtMonIgnitionCycles" Text="—" Style="{StaticResource MonoValueSmall}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="4" Grid.Column="1" Margin="4,0,0,6">
+                                    <TextBlock Text="Циклы аварии" Style="{StaticResource NeonLabel}"/>
+                                    <TextBlock x:Name="TxtMonAlarmCycles" Text="—" Style="{StaticResource MonoValueSmall}"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <Border Background="{DynamicResource BgInputBrush}" CornerRadius="4" Padding="8,5" Margin="0,4,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Наработка: " Style="{StaticResource NeonLabel}"/>
+                                    <TextBlock x:Name="TxtUptime" Text="—" FontFamily="Consolas" FontSize="12"
+                                               Foreground="{DynamicResource NeonGreenBrush}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="  ч:мм:сс" Style="{StaticResource NeonLabel}" Margin="2,0,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ФЛАГИ ОШИБОК -->
+                    <Border Style="{StaticResource PanelBorder}" Margin="0,0,0,8">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="⚑" FontSize="13" Foreground="{DynamicResource NeonRedBrush}"
+                                           Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Флаги ошибок" Style="{StaticResource SectionTitle}"/>
+                                <TextBlock x:Name="TxtErrorHex" Text="[0x0000]" FontFamily="Consolas" FontSize="9"
+                                           Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"
+                                           Margin="6,0,0,0"/>
+                            </StackPanel>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Биты 15–8 -->
+                                <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                                    <TextBlock Text="Биты 15–8" Style="{StaticResource NeonLabel}" Margin="0,0,0,4" FontSize="8"/>
+
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="15" FontFamily="Consolas" FontSize="8" Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="Bit15" Grid.Column="1" Text="·" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource DimTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="Резерв" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="14" FontFamily="Consolas" FontSize="8" Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="Bit14" Grid.Column="1" Text="·" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource DimTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="MB_CON_BREAK" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="13" FontFamily="Consolas" FontSize="8" Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="Bit13" Grid.Column="1" Text="·" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource DimTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="DATA_EEPROM" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="12" FontFamily="Consolas" FontSize="8" Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="Bit12" Grid.Column="1" Text="·" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource DimTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="HW_EEPROM" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="11" FontFamily="Consolas" FontSize="8" Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="Bit11" Grid.Column="1" Text="·" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource DimTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="CAT_HEAT" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="10" FontFamily="Consolas" FontSize="8" Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="Bit10" Grid.Column="1" Text="·" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource DimTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="OVERHEAT" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="9" FontFamily="Consolas" FontSize="8" Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="Bit9" Grid.Column="1" Text="·" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource DimTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="LAMP_STAB" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="8" FontFamily="Consolas" FontSize="8" Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="Bit8" Grid.Column="1" Text="·" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource DimTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="LAMP_DIODE" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- Биты 7–0 -->
+                                <StackPanel Grid.Column="1" Margin="6,0,0,0">
+                                    <TextBlock Text="Биты 7–0" Style="{StaticResource NeonLabel}" Margin="0,0,0,4" FontSize="8"/>
+
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="7" FontFamily="Consolas" FontSize="8" Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="Bit7" Grid.Column="1" Text="·" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource DimTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="INVERTOR" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="6" FontFamily="Consolas" FontSize="8" Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="Bit6" Grid.Column="1" Text="·" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource DimTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="LEAKAGE" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="5" FontFamily="Consolas" FontSize="8" Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="Bit5" Grid.Column="1" Text="·" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource DimTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="LAMP_SHC" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="4" FontFamily="Consolas" FontSize="8" Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="Bit4" Grid.Column="1" Text="·" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource DimTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="LAMP_BRC" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="3" FontFamily="Consolas" FontSize="8" Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="Bit3" Grid.Column="1" Text="·" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource DimTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="DISCH_IGN" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="2" FontFamily="Consolas" FontSize="8" Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="Bit2" Grid.Column="1" Text="·" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource DimTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="ACU" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="1" FontFamily="Consolas" FontSize="8" Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="Bit1" Grid.Column="1" Text="·" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource DimTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="ACU_MAX" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="18"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="0" FontFamily="Consolas" FontSize="8" Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="Bit0" Grid.Column="1" Text="·" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource DimTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="ACU_MIN" Style="{StaticResource NeonLabel}" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- НАРАБОТКА -->
+                    <Border Style="{StaticResource PanelBorder}" Margin="0,0,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Наработка и метки" Style="{StaticResource SectionTitle}" Margin="0,0,0,8"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                                    <TextBlock Text="Наработка" Style="{StaticResource NeonLabel}" Margin="0,0,0,2"/>
+                                    <TextBlock x:Name="TxtWorkHours" Text="—" Style="{StaticResource MonoValueSmall}"/>
+                                    <TextBlock x:Name="TxtWorkMinutes" Text="—" Style="{StaticResource NeonLabel}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="4,0,4,0">
+                                    <TextBlock Text="Метки макс." Style="{StaticResource NeonLabel}" Margin="0,0,0,2"/>
+                                    <TextBlock x:Name="TxtMaxVoltage" Text="—" Style="{StaticResource MonoValueSmall}"/>
+                                    <TextBlock x:Name="TxtMaxTemp" Text="—" Style="{StaticResource NeonLabel}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Margin="4,0,0,0">
+                                    <TextBlock Text="Метки утечек" Style="{StaticResource NeonLabel}" Margin="0,0,0,2"/>
+                                    <TextBlock x:Name="TxtLeakCurrent" Text="—" Style="{StaticResource MonoValueSmall}"/>
+                                    <TextBlock x:Name="TxtLeakCable" Text="—" Style="{StaticResource NeonLabel}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- RIGHT COLUMN -->
+            <ScrollViewer Grid.Column="1" 
+                          VerticalScrollBarVisibility="Auto" 
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="14,10,10,10" Margin="0,0,10,0">
+                <StackPanel>
+
+                    <!-- СЕРВИСНЫЙ РЕЖИМ -->
+                    <Border Style="{StaticResource PanelBorder}" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="Сервисный режим" Style="{StaticResource SectionTitle}" Margin="0,0,0,8"/>
+
+                            <Button x:Name="BtnServiceMode" Content="🔒 Войти в сервис"
+                                    Style="{StaticResource BtnServiceEnter}"
+                                    HorizontalAlignment="Stretch"
+                                    Click="BtnServiceMode_Click"/>
+
+                            <Button x:Name="BtnSaveSettings" Content="💾 Сохранить настройки"
+                                    Style="{StaticResource BtnGreen}"
+                                    HorizontalAlignment="Stretch" Margin="0,8,0,0"
+                                    IsEnabled="False"
+                                    Click="BtnSaveSettings_Click"/>
+
+                            <Button x:Name="BtnResetLampResource" Content="🔄 Сброс ресурса лампы"
+                                    Style="{StaticResource BtnYellow}"
+                                    HorizontalAlignment="Stretch" Margin="0,4,0,0"
+                                    Visibility="Collapsed"
+                                    Click="BtnResetLampResource_Click"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- НАСТРОЙКА ПАРАМЕТРОВ (шаблоны) -->
+                    <Border Style="{StaticResource PanelBorder}" Margin="0,0,0,8">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="⊞" FontSize="13" Foreground="{DynamicResource NeonCyanBrush}"
+                                           Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Настройка параметров" Style="{StaticResource SectionTitle}"/>
+                            </StackPanel>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="6"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="6"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="6"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <ComboBox x:Name="CmbTemplates"
+                                          Grid.Column="0"
+                                          SelectionChanged="CmbTemplates_SelectionChanged"/>
+
+                                <Button x:Name="BtnApplyTemplate"
+                                        Grid.Column="2"
+                                        Content="▶ Применить"
+                                        Style="{StaticResource BtnGreen}"
+                                        Padding="8,4"
+                                        ToolTip="Применить шаблон к текущему устройству"
+                                        Click="BtnApplyTemplate_Click"/>
+
+                                <Button x:Name="BtnCreateTemplate"
+                                        Grid.Column="4"
+                                        Content="+ Создать новый"
+                                        Style="{StaticResource BtnGreen}"
+                                        Padding="8,4"
+                                        ToolTip="Сохранить текущие значения как новый шаблон"
+                                        Click="BtnCreateTemplate_Click"/>
+
+                                <Button x:Name="BtnDeleteTemplate"
+                                        Grid.Column="6"
+                                        Content="✕ Удалить"
+                                        Style="{StaticResource BtnRed}"
+                                        Padding="8,4"
+                                        ToolTip="Удалить выбранный шаблон"
+                                        Click="BtnDeleteTemplate_Click"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ПАРАМЕТРЫ ЗАПУСКА ПОСЛЕ ПОДАЧИ ПИТАНИЯ -->
+                    <Border x:Name="StartupParamsSection"
+                            Style="{StaticResource ServiceSectionBorder}" Margin="0,0,0,8">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="⟳" FontSize="14" Foreground="{DynamicResource NeonYellowBrush}"
+                                           Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Параметры запуска после подачи питания"
+                                           Style="{StaticResource SectionTitle}"/>
+                            </StackPanel>
+
+                            <Border x:Name="StartModeSelector"
+                                    Background="Transparent"
+                                    Cursor="Hand"
+                                    HorizontalAlignment="Left"
+                                    Margin="0,0,0,10">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+
+                                    <!-- 🚫 = 7: Запуск запрещён -->
+                                    <Border x:Name="StartModeBorder7"
+                                            Tag="7"
+                                            Style="{StaticResource StartMode7Style}"
+                                            Margin="0,0,4,0"
+                                            VerticalAlignment="Center"
+                                            MouseLeftButtonDown="StartModeIcon_Click"
+                                            ToolTip="Запуск запрещён">
+                                        <TextBlock Text="🚫" FontSize="14"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+
+                                    <Path Data="M0,8 L12,8" Stroke="{DynamicResource BorderMidBrush}" StrokeThickness="1"
+                                          VerticalAlignment="Center" Margin="0,0,4,0"/>
+
+                                    <!-- ⚡ = 4: Прогрев → Выкл -->
+                                    <Border x:Name="StartModeBorder4"
+                                            Tag="4"
+                                            Style="{StaticResource StartMode4Style}"
+                                            Margin="0,0,4,0"
+                                            VerticalAlignment="Center"
+                                            MouseLeftButtonDown="StartModeIcon_Click"
+                                            ToolTip="Прогрев → Выкл">
+                                        <TextBlock Text="⚡" FontSize="14"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource NeonYellowBrush}"/>
+                                    </Border>
+
+                                    <Path Data="M0,8 L12,8" Stroke="{DynamicResource BorderMidBrush}" StrokeThickness="1"
+                                          VerticalAlignment="Center" Margin="0,0,4,0"/>
+
+                                    <!-- ☀ = 1: Прогрев → Поджиг → Выкл -->
+                                    <Border x:Name="StartModeBorder1"
+                                            Tag="1"
+                                            Style="{StaticResource StartMode1Style}"
+                                            Margin="0,0,4,0"
+                                            VerticalAlignment="Center"
+                                            MouseLeftButtonDown="StartModeIcon_Click"
+                                            ToolTip="Прогрев → Поджиг → Выкл">
+                                        <TextBlock Text="☀" FontSize="14"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource DimGreenBrush}"/>
+                                    </Border>
+
+                                    <Path Data="M0,8 L12,8" Stroke="{DynamicResource BorderMidBrush}" StrokeThickness="1"
+                                          VerticalAlignment="Center" Margin="0,0,4,0"/>
+
+                                    <!-- ◈ = 0: Прогрев → Поджиг → Работа -->
+                                    <Border x:Name="StartModeBorder0"
+                                            Tag="0"
+                                            Style="{StaticResource StartMode0Style}"
+                                            VerticalAlignment="Center"
+                                            MouseLeftButtonDown="StartModeIcon_Click"
+                                            ToolTip="Прогрев → Поджиг → Работа">
+                                        <TextBlock Text="◈" FontSize="14"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource DimCyanBrush}"/>
+                                    </Border>
+
+                                </StackPanel>
+                            </Border>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="Включить после подачи:" Style="{StaticResource NeonLabel}" Margin="0,0,8,0"/>
+                                <ToggleButton x:Name="ToggleAfterPowerUp" Style="{StaticResource ToggleSwitch}"
+                                              IsChecked="False"
+                                              Checked="ToggleAfterPowerUp_Changed"
+                                              Unchecked="ToggleAfterPowerUp_Changed"/>
+                            </StackPanel>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="130"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <Grid Margin="0,0,0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Ток после подачи (%)"
+                                                   Style="{StaticResource NeonLabel}"/>
+                                        <TextBlock Grid.Column="1" x:Name="TxtAfterPowerUpSet"
+                                                   Text="0%" Style="{StaticResource MonoValueSmall}"/>
+                                    </Grid>
+                                    <Slider x:Name="SliderAfterPowerUpSet"
+                                            Style="{StaticResource NeonSlider}"
+                                            Minimum="50" Maximum="100" Value="0"
+                                            ValueChanged="SliderAfterPowerUpSet_ValueChanged"
+                                            Thumb.DragStarted="SliderAfterPowerUpSet_DragStarted"
+                                            Thumb.DragCompleted="SliderAfterPowerUpSet_DragCompleted"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Пауза перед запуском"
+                                               Style="{StaticResource NeonLabel}" Margin="0,0,0,4"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox x:Name="TxtStartPause" Grid.Column="0" Text="0" 
+                                                 HorizontalAlignment="Stretch"
+                                                 LostFocus="TxtStartPause_LostFocus"/>
+                                        <TextBlock Grid.Column="1" Text=" сек" Style="{StaticResource NeonLabel}"
+                                                   Margin="4,0,0,0"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ОСНОВНЫЕ ПАРАМЕТРЫ ЛАМПЫ -->
+                    <Border x:Name="ParamsLampSection"
+                            Style="{StaticResource ServiceSectionBorder}" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="Основные параметры лампы"
+                                       Style="{StaticResource SectionTitle}" Margin="0,0,0,8"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="8"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="8"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
+
+                                <StackPanel Grid.Row="2" Grid.Column="0">
+                                    <TextBlock Text="Номинальная мощность" Style="{StaticResource NeonLabel}" Margin="0,0,0,4"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox x:Name="TxtNomPower" Grid.Column="0" Text="0"
+                                                 LostFocus="TxtNomPower_LostFocus"/>
+                                        <TextBlock Grid.Column="1" Text=" Вт" Style="{StaticResource NeonLabel}" Margin="4,0,0,0"/>
+                                    </Grid>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="2" Grid.Column="2">
+                                    <TextBlock Text="Режим стабилизации" Style="{StaticResource NeonLabel}" Margin="0,0,0,4"/>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="Мощн" Style="{StaticResource NeonLabel}" Margin="0,0,6,0"/>
+                                        <ToggleButton x:Name="ToggleStabMode" Style="{StaticResource ToggleSwitch}"
+                                                      IsChecked="False"
+                                                      Checked="ToggleStabMode_Changed"
+                                                      Unchecked="ToggleStabMode_Changed"/>
+                                        <TextBlock x:Name="TxtStabMode" Text=" Ток"
+                                                   Style="{StaticResource NeonLabel}" Margin="6,0,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="4" Grid.Column="0">
+                                    <TextBlock Text="Номинальный ток" Style="{StaticResource NeonLabel}" Margin="0,0,0,4"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox x:Name="TxtNomCurrent" Grid.Column="0" Text="0.000"
+                                                 LostFocus="TxtNomCurrent_LostFocus"/>
+                                        <TextBlock Grid.Column="1" Text=" А" Style="{StaticResource NeonLabel}" Margin="4,0,0,0"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ПРОГРЕВ -->
+                    <Grid x:Name="HeatingSection" Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Style="{StaticResource ServiceSectionBorder}">
+                            <StackPanel>
+                                <TextBlock Text="Прогрев электродов" Style="{StaticResource SectionTitle}"
+                                           FontSize="10" Margin="0,0,0,8"/>
+                                <TextBlock Text="Ток прогрева (А)" Style="{StaticResource NeonLabel}" Margin="0,0,0,4"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="TxtHeatCathodesCurrent" Grid.Column="0" Text="0.000"
+                                             LostFocus="TxtHeatCathodesCurrent_LostFocus"/>
+                                    <TextBlock Grid.Column="1" Text=" А" Style="{StaticResource NeonLabel}" Margin="4,0,0,0"/>
+                                </Grid>
+                                <TextBlock Text="Время прогрева (сек)" Style="{StaticResource NeonLabel}" Margin="0,0,0,4"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="TxtHeatCathodesTime" Grid.Column="0" Text="0"
+                                             LostFocus="TxtHeatCathodesTime_LostFocus"/>
+                                    <TextBlock Grid.Column="1" Text=" сек" Style="{StaticResource NeonLabel}" Margin="4,0,0,0"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="2" Style="{StaticResource ServiceSectionBorder}">
+                            <StackPanel>
+                                <TextBlock Text="Прогрев после поджига" Style="{StaticResource SectionTitle}"
+                                           FontSize="10" Margin="0,0,0,8"/>
+                                <TextBlock Text="Уровень тока (%)" Style="{StaticResource NeonLabel}" Margin="0,0,0,4"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="TxtHeatLampPercent" Grid.Column="0" Text="0"
+                                             LostFocus="TxtHeatLampPercent_LostFocus"/>
+                                    <TextBlock Grid.Column="1" Text=" %" Style="{StaticResource NeonLabel}" Margin="4,0,0,0"/>
+                                </Grid>
+                                <TextBlock Text="Время прогрева (сек)" Style="{StaticResource NeonLabel}" Margin="0,0,0,4"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="TxtHeatLampTime" Grid.Column="0" Text="0"
+                                             LostFocus="TxtHeatLampTime_LostFocus"/>
+                                    <TextBlock Grid.Column="1" Text=" сек" Style="{StaticResource NeonLabel}" Margin="4,0,0,0"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- ЗАЩИТНЫЕ ФУНКЦИИ -->
+                    <Border x:Name="ProtectionSection"
+                            Style="{StaticResource ServiceSectionBorder}" Margin="0,0,0,8">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="🛡" FontSize="12" Foreground="{DynamicResource NeonCyanBrush}"
+                                           Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Защитные функции" Style="{StaticResource SectionTitle}"/>
+                            </StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0"
+                                        Background="{DynamicResource BgInputBrush}"
+                                        CornerRadius="4" Padding="8,6">
+                                    <StackPanel>
+                                        <TextBlock Text="Утечка с кабеля" Style="{StaticResource NeonLabel}" Margin="0,0,0,6"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Откл" Style="{StaticResource NeonLabel}" Margin="0,0,6,0"/>
+                                            <ToggleButton x:Name="ToggleLeakCable" Style="{StaticResource ToggleSwitch}" 
+                                                          IsChecked="False"
+                                                          Checked="ToggleLeakCable_Changed"
+                                                          Unchecked="ToggleLeakCable_Changed"/>
+                                            <TextBlock Text=" Вкл" Style="{StaticResource NeonLabel}" Margin="6,0,0,0"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="2"
+                                        Background="{DynamicResource BgInputBrush}"
+                                        CornerRadius="4" Padding="8,6">
+                                    <StackPanel>
+                                        <TextBlock Text="Утечка внутри кабеля" Style="{StaticResource NeonLabel}" Margin="0,0,0,6"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Откл" Style="{StaticResource NeonLabel}" Margin="0,0,6,0"/>
+                                            <ToggleButton x:Name="ToggleLeakInternal" Style="{StaticResource ToggleSwitch}" 
+                                                          IsChecked="False"
+                                                          Checked="ToggleLeakInternal_Changed"
+                                                          Unchecked="ToggleLeakInternal_Changed"/>
+                                            <TextBlock Text=" Вкл" Style="{StaticResource NeonLabel}" Margin="6,0,0,0"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- НАСТРОЙКИ MODBUS -->
+                    <Border x:Name="ModbusSection"
+                            Style="{StaticResource ServiceSectionBorder}" Margin="0,0,0,0">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="⇌" FontSize="14" Foreground="{DynamicResource NeonCyanBrush}"
+                                           Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Настройки Modbus" Style="{StaticResource SectionTitle}"/>
+                            </StackPanel>
+
+                            <WrapPanel Orientation="Horizontal">
+                                <StackPanel Margin="0,0,12,8" Width="110">
+                                    <TextBlock Text="Скорость (Бит/с)" Style="{StaticResource NeonLabel}" Margin="0,0,0,4"/>
+                                    <ComboBox x:Name="CmbBaudRate" SelectedIndex="0"
+                                              SelectionChanged="CmbBaudRate_SelectionChanged">
+                                        <ComboBoxItem>9600</ComboBoxItem>
+                                        <ComboBoxItem>14400</ComboBoxItem>
+                                        <ComboBoxItem>19200</ComboBoxItem>
+                                        <ComboBoxItem>28800</ComboBoxItem>
+                                        <ComboBoxItem>38400</ComboBoxItem>
+                                        <ComboBoxItem>57600</ComboBoxItem>
+                                        <ComboBoxItem>76800</ComboBoxItem>
+                                        <ComboBoxItem>115200</ComboBoxItem>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,12,8" Width="80">
+                                    <TextBlock Text="Стоп-биты" Style="{StaticResource NeonLabel}" Margin="0,0,0,4"/>
+                                    <ComboBox x:Name="CmbStopBits" SelectedIndex="0"
+                                              SelectionChanged="CmbStopBits_SelectionChanged">
+                                        <ComboBoxItem>1</ComboBoxItem>
+                                        <ComboBoxItem>2</ComboBoxItem>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,12,8" Width="90">
+                                    <TextBlock Text="Чётность" Style="{StaticResource NeonLabel}" Margin="0,0,0,4"/>
+                                    <ComboBox x:Name="CmbParity" SelectedIndex="0"
+                                              SelectionChanged="CmbParity_SelectionChanged">
+                                        <ComboBoxItem>None</ComboBoxItem>
+                                        <ComboBoxItem>Even</ComboBoxItem>
+                                        <ComboBoxItem>Odd</ComboBoxItem>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,12,8" Width="60">
+                                    <TextBlock Text="Адрес" Style="{StaticResource NeonLabel}" Margin="0,0,0,4"/>
+                                    <TextBox x:Name="TxtModbusAddress" Text="1"
+                                             LostFocus="TxtModbusAddress_LostFocus"/>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,12,8" Width="80">
+                                    <TextBlock Text="Таймаут (сек)" Style="{StaticResource NeonLabel}" Margin="0,0,0,4"/>
+                                    <TextBox x:Name="TxtTimeout" Text="0"
+                                             LostFocus="TxtTimeout_LostFocus"/>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,12,8" VerticalAlignment="Bottom">
+                                    <TextBlock Text="Автовыкл" Style="{StaticResource NeonLabel}" Margin="0,0,0,4"/>
+                                    <ToggleButton x:Name="ToggleAutoOff" Style="{StaticResource ToggleSwitch}" IsChecked="False"/>
+                                </StackPanel>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- OVERLAY -->
+        <Border x:Name="SaveOverlay"
+                Grid.RowSpan="2"
+                Background="{DynamicResource SaveOverlayBgBrush}"
+                Visibility="Collapsed"
+                IsHitTestVisible="True">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="💾"
+                           FontSize="48"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource NeonYellowBrush}"/>
+                <TextBlock Text="Сохранение настроек..."
+                           FontFamily="Consolas" FontSize="16" FontWeight="Bold"
+                           Foreground="{DynamicResource NeonYellowBrush}"
+                           HorizontalAlignment="Center"
+                           Margin="0,12,0,4"/>
+                <TextBlock Text="Пожалуйста, подождите 5 секунд"
+                           FontFamily="Consolas" FontSize="12"
+                           Foreground="{DynamicResource DimTextBrush}"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

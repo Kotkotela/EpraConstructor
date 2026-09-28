@@ -1,0 +1,414 @@
+﻿<Window x:Class="EpraConstructor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        Title="ЭПРА Конструктор"
+        Width="1234" Height="682"
+        MinWidth="900" MinHeight="600"
+        WindowStyle="None"
+        AllowsTransparency="False"
+        Background="{DynamicResource BgBrush}"
+        SnapsToDevicePixels="True"
+        AllowDrop="True"
+        DragEnter="Window_DragEnter"
+        DragOver="Window_DragOver"
+        DragLeave="Window_DragLeave"
+        Drop="Window_Drop">
+
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome ResizeBorderThickness="5"
+                            CaptionHeight="0"
+                            GlassFrameThickness="0"
+                            CornerRadius="0"/>
+    </shell:WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="StartBtnBg" Color="#0A2030"/>
+    </Window.Resources>
+
+    <Grid>
+        <!-- MAIN VIEW -->
+        <Grid x:Name="MainView">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="527*"/>
+                <ColumnDefinition Width="120*"/>
+                <ColumnDefinition Width="30*"/>
+                <ColumnDefinition Width="523*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="36"/>
+                <RowDefinition Height="46"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="28"/>
+            </Grid.RowDefinitions>
+
+            <!-- TITLE BAR -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource BgBrush}"
+                    BorderBrush="{DynamicResource BorderDimBrush}"
+                    BorderThickness="0,0,0,1"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" Grid.ColumnSpan="4">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0">
+                        <Border Width="20" Height="20" Margin="0,0,8,0">
+                            <Path Data="M10,2 L18,10 L10,18 L2,10 Z"
+                                  Fill="{DynamicResource NeonGreenBrush}"
+                                  Stretch="Fill">
+                                <Path.Effect>
+                                    <DropShadowEffect Color="#00FF88" BlurRadius="8" ShadowDepth="0" Opacity="0.9"/>
+                                </Path.Effect>
+                            </Path>
+                        </Border>
+                        <TextBlock Text="ЭПРА" FontFamily="Consolas" FontSize="13" FontWeight="Bold"
+                                   Foreground="{DynamicResource NeonGreenBrush}" VerticalAlignment="Center">
+                            <TextBlock.Effect>
+                                <DropShadowEffect Color="#00FF88" BlurRadius="8" ShadowDepth="0" Opacity="0.7"/>
+                            </TextBlock.Effect>
+                        </TextBlock>
+                        <TextBlock Text=" КОНСТРУКТОР" FontFamily="Segoe UI" FontSize="11"
+                                   Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Button x:Name="BtnMinimize" Style="{StaticResource CaptionBtn}"
+                                Content="—" Click="BtnMinimize_Click"
+                                shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
+                        <Button x:Name="BtnMaximize" Style="{StaticResource CaptionBtn}"
+                                Content="□" Click="BtnMaximize_Click"
+                                shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
+                        <Button x:Name="BtnClose" Style="{StaticResource CloseBtn}"
+                                Content="✕" Click="BtnClose_Click"
+                                shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- TOOLBAR -->
+            <Border Grid.Row="1"
+                    Background="{DynamicResource BgPanelBrush}"
+                    BorderBrush="{DynamicResource BorderDimBrush}"
+                    BorderThickness="0,0,0,1" Grid.ColumnSpan="4">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0">
+                        <TextBlock Text="◈" FontSize="16" Foreground="{DynamicResource NeonCyanBrush}"
+                                   VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock Text="Порт:" Style="{StaticResource NeonLabel}" Margin="0,0,4,0"/>
+                        <ComboBox x:Name="CmbPort" Width="80" Margin="0,0,6,0" SelectedIndex="0"
+                                  SelectionChanged="CmbPort_SelectionChanged"/>
+
+                        <TextBlock x:Name="TextBaud" Text="Baud:" Style="{StaticResource NeonLabel}" Margin="0,0,4,0"/>
+                        <ComboBox x:Name="CmbBaud" Width="80" Margin="0,0,6,0" SelectedIndex="0">
+                            <ComboBoxItem>9600</ComboBoxItem>
+                            <ComboBoxItem>14400</ComboBoxItem>
+                            <ComboBoxItem>19200</ComboBoxItem>
+                            <ComboBoxItem>28800</ComboBoxItem>
+                            <ComboBoxItem>38400</ComboBoxItem>
+                            <ComboBoxItem>57600</ComboBoxItem>
+                            <ComboBoxItem>76800</ComboBoxItem>
+                            <ComboBoxItem>115200</ComboBoxItem>
+                        </ComboBox>
+
+                        <TextBlock x:Name="TextAddress" Text="Адрес:" Style="{StaticResource NeonLabel}" Margin="0,0,4,0"/>
+                        <TextBox x:Name="TxtAddress" Width="44" Text="1" Margin="0,0,6,0" VerticalAlignment="Center"/>
+
+                        <Border Style="{StaticResource ToolbarSep}"/>
+
+                        <TextBlock Text="Режим:" Style="{StaticResource NeonLabel}" Margin="0,0,4,0"/>
+                        <Border Background="{DynamicResource BgPanelBrush}" CornerRadius="4" Padding="2" Margin="0,0,6,0">
+                            <StackPanel Orientation="Horizontal">
+                                <ToggleButton x:Name="BtnAuto" Content="АВТО" IsChecked="True"
+                                              Width="52" Height="24" Cursor="Hand"
+                                              FontFamily="Consolas" FontSize="11"
+                                              Margin="0,0,3,0"
+                                              Checked="BtnAuto_Checked">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="ToggleButton">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource DimTextBrush}"/>
+                                            <Setter Property="BorderBrush" Value="{DynamicResource BorderMidBrush}"/>
+                                            <Setter Property="BorderThickness" Value="1"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ToggleButton">
+                                                        <Border x:Name="Bd"
+                                                                Background="{TemplateBinding Background}"
+                                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                                CornerRadius="3"
+                                                                SnapsToDevicePixels="True">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsChecked" Value="True">
+                                                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BgCardBrush}"/>
+                                                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource NeonCyanBrush}"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource HoverBgBrush}"/>
+                                                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource DimCyanBrush}"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
+                                </ToggleButton>
+
+                                <ToggleButton x:Name="BtnManual" Content="РУЧ"
+                                              Width="52" Height="24" Cursor="Hand"
+                                              FontFamily="Consolas" FontSize="11"
+                                              Checked="BtnManual_Checked">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="ToggleButton">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource DimTextBrush}"/>
+                                            <Setter Property="BorderBrush" Value="{DynamicResource BorderMidBrush}"/>
+                                            <Setter Property="BorderThickness" Value="1"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ToggleButton">
+                                                        <Border x:Name="Bd"
+                                                                Background="{TemplateBinding Background}"
+                                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                                CornerRadius="3"
+                                                                SnapsToDevicePixels="True">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsChecked" Value="True">
+                                                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BgCardBrush}"/>
+                                                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource NeonCyanBrush}"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource HoverBgBrush}"/>
+                                                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource DimCyanBrush}"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
+                                </ToggleButton>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource ToolbarSep}"/>
+
+                        <TextBlock Text="Модель:" Style="{StaticResource NeonLabel}" Margin="0,0,4,0"/>
+                        <ComboBox x:Name="CmbModel" Width="110" Margin="0,0,6,0" SelectedIndex="0">
+                            <ComboBoxItem>ЭПРА 1.0</ComboBoxItem>
+                        </ComboBox>
+
+                        <Button x:Name="BtnAddDevice" Content="+ Добавить" Style="{StaticResource BtnGreen}"
+                                Padding="10,4" Margin="0,0,8,0"
+                                Click="BtnAddDevice_Click"/>
+
+                        <Border Style="{StaticResource ToolbarSep}"/>
+
+                        <Button x:Name="BtnExecute" Style="{StaticResource BtnCyan}"
+                                Content="▶  ВЫПОЛНИТЬ" Padding="14,4" Margin="0,0,8,0"
+                                Click="BtnExecute_Click"/>
+
+                        <Button x:Name="BtnStartPoll" Style="{StaticResource BtnGreen}"
+                                Content="▶  НАЧАТЬ" Padding="14,4" Margin="0,0,8,0"
+                                Click="BtnStartPoll_Click"/>
+
+                        <Button x:Name="BtnDisconnectPort"
+                                Content="🔌  ПОДКЛЮЧИТЬ"
+                                Style="{StaticResource BtnGreen}"
+                                Padding="14,4"
+                                Click="BtnDisconnectPort_Click"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- CONTENT -->
+            <ScrollViewer x:Name="CardsScroll"
+                          Grid.Row="2"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="8,8,2,8"
+                          Grid.ColumnSpan="4"
+                          AllowDrop="True"
+                          DragOver="CardsScroll_DragOver"
+                          Drop="CardsScroll_Drop"
+                          Background="Transparent">
+                <WrapPanel x:Name="DeviceCardsPanel"
+                           Orientation="Horizontal"/>
+            </ScrollViewer>
+
+            <!-- STATUS BAR -->
+            <Border Grid.Row="3"
+                    Background="{DynamicResource BgBrush}"
+                    BorderBrush="{DynamicResource BorderDimBrush}"
+                    BorderThickness="0,1,0,0" Grid.ColumnSpan="4">
+                <Grid Margin="12,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               x:Name="TxtStatusMsg"
+                               Text="Готов к работе"
+                               Style="{StaticResource StatusLabel}"
+                               VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="3" Text="Активных: " Style="{StaticResource NeonLabel}" Margin="0,0,2,0"/>
+                    <TextBlock Grid.Column="4" x:Name="TxtActiveCount" Text="0" FontFamily="Consolas" FontSize="10"
+                               Foreground="{DynamicResource NeonCyanBrush}"
+                               VerticalAlignment="Center"/>
+
+                    <!-- Кнопка сохранения конфига в файл -->
+                    <Button x:Name="BtnExportConfig"
+        Grid.Column="5"
+        Content="💾 Сохранить шаблон"
+        Style="{StaticResource BtnCyan}"
+        Height="22"
+        Padding="10,0"
+        FontFamily="Consolas" FontSize="10"
+        Margin="12,0,0,0"
+        VerticalAlignment="Center"
+        ToolTip="Сохранить конфигурацию в файл для переноса"
+        Click="BtnExportConfig_Click"/>
+
+                    <!-- ТЕМА: iOS-style switch -->
+                    <Border Grid.Column="6"
+                            Background="{DynamicResource BgPanelBrush}"
+                            BorderBrush="{DynamicResource BorderMidBrush}"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Padding="2"
+                            Margin="12,0,0,0"
+                            VerticalAlignment="Center">
+                        <Grid Width="76" Height="22">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Скользящий индикатор -->
+                            <Border x:Name="ThemeThumb"
+                                    Grid.Column="0"
+                                    Width="36"
+                                    Height="18"
+                                    CornerRadius="9"
+                                    Background="{DynamicResource BgCardBrush}"
+                                    HorizontalAlignment="Left"
+                                    Margin="2,0,0,0"
+                                    VerticalAlignment="Center">
+                                <Border.RenderTransform>
+                                    <TranslateTransform x:Name="ThemeThumbTransform" X="0"/>
+                                </Border.RenderTransform>
+                                <Border.Effect>
+                                    <DropShadowEffect Color="Black" BlurRadius="4" ShadowDepth="0" Opacity="0.4"/>
+                                </Border.Effect>
+                            </Border>
+
+                            <!-- Кнопка "тёмная" (луна) -->
+                            <Button x:Name="BtnThemeDark"
+                                    Grid.Column="0"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Padding="0"
+                                    Click="BtnThemeDark_Click"
+                                    ToolTip="Тёмная тема">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="Transparent">
+                                            <TextBlock x:Name="Icon"
+                                                       Text="🌙"
+                                                       FontSize="12"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Icon" Property="Opacity" Value="0.8"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+
+                            <!-- Кнопка "светлая" (солнце) -->
+                            <Button x:Name="BtnThemeLight"
+                                    Grid.Column="1"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Padding="0"
+                                    Click="BtnThemeLight_Click"
+                                    ToolTip="Светлая тема">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="Transparent">
+                                            <TextBlock x:Name="Icon"
+                                                       Text="☀"
+                                                       FontSize="12"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Icon" Property="Opacity" Value="0.8"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- EXPANDED VIEW -->
+        <ContentControl x:Name="ExpandedViewHost" Visibility="Collapsed"/>
+
+        <!-- OVERLAY: подсказка при перетаскивании конфига -->
+        <Border x:Name="DropOverlay"
+                Visibility="Collapsed"
+                IsHitTestVisible="False"
+                Background="{DynamicResource SaveOverlayBgBrush}"
+                Panel.ZIndex="9999">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border Width="180" Height="180" CornerRadius="90"
+                        Background="{DynamicResource BgPanelBrush}"
+                        BorderBrush="{DynamicResource NeonGreenBrush}"
+                        BorderThickness="4"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#00FF88" BlurRadius="40" ShadowDepth="0" Opacity="1.0"/>
+                    </Border.Effect>
+                    <TextBlock Text="+"
+                               FontFamily="Consolas"
+                               FontSize="140"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource NeonGreenBrush}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Margin="0,-20,0,0"/>
+                </Border>
+                <TextBlock Text="Отпустите, чтобы загрузить конфиг"
+                           FontFamily="Consolas" FontSize="16" FontWeight="Bold"
+                           Foreground="{DynamicResource NeonGreenBrush}"
+                           HorizontalAlignment="Center"
+                           Margin="0,24,0,0"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
